@@ -1,0 +1,1 @@
+Snake: snake.c gcc -Wall -o snake snake.c
