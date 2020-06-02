@@ -20,7 +20,7 @@ struct Point {
 };
 
 
-bool It_Is_A_Box(Point* Box, int X, int Y, int Boxes) {
+bool Is_A_Box(Point* Box, int X, int Y, int Boxes) {
 	for (int i = 0; i < Boxes; i++) {
 		if (Box[i].x == X && Box[i].y == Y) {
 			return true;
@@ -29,52 +29,65 @@ bool It_Is_A_Box(Point* Box, int X, int Y, int Boxes) {
 	return false;
 }
 
-
-void Move(char Direction, Point& Loader, string* Map, Point* Box, int Boxes) {
-	int offset = 1;
-	int num = -1;
+int Box_Num(Point* Box, int X, int Y, int Boxes) {
 	for (int i = 0; i < Boxes; i++) {
-		if (Direction == 'w' && It_Is_A_Box(Box, Loader.x, Loader.y - 1, Boxes)/*Loader.y - 1 == Box[i].y && Loader.x == Box[i].x*/) {
-			offset = 2;
-			num = i;
+		if (Box[i].x == X && Box[i].y == Y) {
+			return i;
 		}
-		else if (Direction == 's' && It_Is_A_Box(Box, Loader.x, Loader.y + 1, Boxes)/*Loader.y + 1 == Box[i].y && Loader.x == Box[i].x*/) {
-			offset = 2;
-			num = i;
-		}
-		else if (Direction == 'a' && It_Is_A_Box(Box, Loader.x - 1, Loader.y, Boxes)/*Loader.y == Box[i].y && Loader.x - 1 == Box[i].x*/) {
-			offset = 2;
-			num = i;
-		}
-		else if (Direction == 'd' && It_Is_A_Box(Box, Loader.x + 1, Loader.y, Boxes)/*Loader.y == Box[i].y && Loader.x + 1 == Box[i].x*/) {
-			offset = 2;
-			num = i;
-		}
-		else offset = 1;
 	}
-
-	if (Direction == 'w' && (Map[Loader.y - offset][Loader.x] == '.' || Map[Loader.y - offset][Loader.x] == 'p')) {
-		Loader.y -= 1;
-		if (offset == 2) Box[num].y -= 1;
-	}
-	else if (Direction == 's' && (Map[Loader.y + offset][Loader.x] == '.' || Map[Loader.y + offset][Loader.x] == 'p')) {
-		Loader.y += 1;
-		if (offset == 2) Box[num].y += 1;
-	}
-	else if (Direction == 'a' && (Map[Loader.y][Loader.x - offset] == '.' || Map[Loader.y][Loader.x - offset] == 'p')) {
-		Loader.x -= 1;
-		if (offset == 2) Box[num].x -= 1;
-	}
-	else if (Direction == 'd' && (Map[Loader.y][Loader.x + offset] == '.' || Map[Loader.y][Loader.x + offset] == 'p')) {
-		Loader.x += 1;
-		if (offset == 2) Box[num].x += 1;
-	}
-	offset = 1;
-	num = -1;
+	return -1;
 }
 
-void Push() {
+bool Move_or_Push(int Dir, Point& Load, Point* Box, int Boxes) {
+	if (Dir == 1 && Is_A_Box(Box, Load.x, Load.y - 1, Boxes)) {
+		return false;
+	}
+	else if (Dir == 2 && Is_A_Box(Box, Load.x - 1, Load.y, Boxes)) {
+		return false;
+	}
+	else if (Dir == 3 && Is_A_Box(Box, Load.x, Load.y + 1, Boxes)) {
+		return false;
+	}
+	else if (Dir == 4 && Is_A_Box(Box, Load.x + 1, Load.y, Boxes)) {
+		return false;
+	}
+	return true;
+}
 
+void Move(int Dir, Point& Load, string* Map/*, Point* Box, int Boxes*/) {
+	if (Dir == 1 && (Map[Load.y - 1][Load.x] == '.' || Map[Load.y - 1][Load.x] == 'p')) {
+		Load.y -= 1;
+	}
+	else if (Dir == 2 && (Map[Load.y][Load.x - 1] == '.' || Map[Load.y][Load.x - 1] == 'p')) {
+		Load.x -= 1;
+	}
+	else if (Dir == 3 && (Map[Load.y + 1][Load.x] == '.' || Map[Load.y + 1][Load.x] == 'p')) {
+		Load.y += 1;
+	}
+	else if (Dir == 4 && (Map[Load.y][Load.x + 1] == '.' || Map[Load.y][Load.x + 1] == 'p')) {
+		Load.x += 1;
+	}
+}
+
+void Push(int Dir, Point& Load, string* Map, Point& Box, int BNum) {
+	if (BNum >= 0) {
+		if (Dir == 1 && (Map[Load.y - 2][Load.x] == '.' || Map[Load.y - 2][Load.x] == 'p')) {
+			Load.y -= 1;
+			Box.y -= 1;
+		}
+		else if (Dir == 2 && (Map[Load.y][Load.x - 2] == '.' || Map[Load.y][Load.x - 2] == 'p')) {
+			Load.x -= 1;
+			Box.x -= 1;
+		}
+		else if (Dir == 3 && (Map[Load.y + 2][Load.x] == '.' || Map[Load.y + 2][Load.x] == 'p')) {
+			Load.y += 1;
+			Box.y += 1;
+		}
+		else if (Dir == 4 && (Map[Load.y][Load.x + 2] == '.' || Map[Load.y][Load.x + 2] == 'p')) {
+			Load.x += 1;
+			Box.x += 1;
+		}
+	}
 }
 
 void Draw(Point& Loader, string* Map, Point* Box, int X, int Y, int Boxes) {
@@ -83,7 +96,7 @@ void Draw(Point& Loader, string* Map, Point* Box, int X, int Y, int Boxes) {
 			if (i == Loader.y && j == Loader.x) {
 				cout << setw(2) << "G";
 			}
-			else if (It_Is_A_Box(Box, j, i, Boxes)) {
+			else if (Is_A_Box(Box, j, i, Boxes)) {
 				cout << setw(2) << "B";
 			}
 			else cout << setw(2) << Map[i][j];
@@ -92,12 +105,27 @@ void Draw(Point& Loader, string* Map, Point* Box, int X, int Y, int Boxes) {
 	}
 }
 
+int Direction(char Key) {
+	if (Key == 'w') {
+		return 1;
+	}
+	else if (Key == 'a') {
+		return 2;
+	}
+	else if (Key == 's') {
+		return 3;
+	}
+	else if (Key == 'd') {
+		return 4;
+	}
+	else return 0;
+}
 
 int main() {
 	//	SetConsoleCP(1251);
 	//	SetConsoleOutputCP(1251);
 
-	int X = 0, Y = 0;
+	int X = 0, Y = 0, Dir;
 	string* Map = nullptr;
 	Point Loader;
 	Loader.x = 0, Loader.y = 0;
@@ -126,10 +154,17 @@ int main() {
 	char key;
 	Draw(Loader, Map, Box, X, Y, Boxes);
 
-	while (Points > 0 || key) {
+	while (Points > 0 || key != 'o') {
 		key = _getch();
 		system("cls");
-		Move(key, Loader, Map, Box, Boxes);
+		Dir = Direction(key);
+		if (!Move_or_Push(Dir, Loader, Box, Boxes)) {
+			Move(Direction(key), Loader, Map);
+		}
+		else {
+			int BNum = Box_Num(Box, Loader.x, Loader.y, Boxes);
+			Push(Dir, Loader, Map, Box[BNum], BNum);
+		}
 		Draw(Loader, Map, Box, X, Y, Boxes);
 	}
 
