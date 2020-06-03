@@ -8,6 +8,8 @@
 
 using namespace std;
 
+string* Map = nullptr;
+
 struct Point {
 	int x;
 	int y;
@@ -20,9 +22,10 @@ struct Point {
 };
 
 
-bool Is_A_Box(Point* Box, int X, int Y, int Boxes) {
+bool Is_A_Box(Point* Box, int X, int Y, int Boxes, int& BNum) {
 	for (int i = 0; i < Boxes; i++) {
 		if (Box[i].x == X && Box[i].y == Y) {
+			BNum = i;
 			return true;
 		}
 	}
@@ -38,23 +41,7 @@ int Box_Num(Point* Box, int X, int Y, int Boxes) {
 	return -1;
 }
 
-bool Move_or_Push(int Dir, Point& Load, Point* Box, int Boxes) {
-	if (Dir == 1 && Is_A_Box(Box, Load.x, Load.y - 1, Boxes)) {
-		return false;
-	}
-	else if (Dir == 2 && Is_A_Box(Box, Load.x - 1, Load.y, Boxes)) {
-		return false;
-	}
-	else if (Dir == 3 && Is_A_Box(Box, Load.x, Load.y + 1, Boxes)) {
-		return false;
-	}
-	else if (Dir == 4 && Is_A_Box(Box, Load.x + 1, Load.y, Boxes)) {
-		return false;
-	}
-	return true;
-}
-
-void Move(int Dir, Point& Load, string* Map/*, Point* Box, int Boxes*/) {
+void Move(int Dir, Point& Load) {
 	if (Dir == 1 && (Map[Load.y - 1][Load.x] == '.' || Map[Load.y - 1][Load.x] == 'p')) {
 		Load.y -= 1;
 	}
@@ -69,7 +56,7 @@ void Move(int Dir, Point& Load, string* Map/*, Point* Box, int Boxes*/) {
 	}
 }
 
-void Push(int Dir, Point& Load, string* Map, Point& Box, int BNum) {
+void Push(int Dir, Point& Load, Point& Box, int BNum) {
 	if (BNum >= 0) {
 		if (Dir == 1 && (Map[Load.y - 2][Load.x] == '.' || Map[Load.y - 2][Load.x] == 'p')) {
 			Load.y -= 1;
@@ -90,19 +77,49 @@ void Push(int Dir, Point& Load, string* Map, Point& Box, int BNum) {
 	}
 }
 
-void Draw(Point& Loader, string* Map, Point* Box, int X, int Y, int Boxes) {
+void Move_or_Push(int Dir, Point& Load, Point* Box, int Boxes) {
+	int BNum;
+	int tmp;
+	if (Dir == 1 && Is_A_Box(Box, Load.x, Load.y - 1, Boxes, BNum) && !Is_A_Box(Box, Load.x, Load.y - 2, Boxes, tmp)) {
+		Push(Dir, Load, Box[BNum], BNum);
+	}
+	else if (Dir == 2 && Is_A_Box(Box, Load.x - 1, Load.y, Boxes, BNum) && !Is_A_Box(Box, Load.x - 2, Load.y, Boxes, tmp)) {
+		Push(Dir, Load, Box[BNum], BNum);
+	}
+	else if (Dir == 3 && Is_A_Box(Box, Load.x, Load.y + 1, Boxes, BNum) && !Is_A_Box(Box, Load.x, Load.y + 2, Boxes, tmp)) {
+		Push(Dir, Load, Box[BNum], BNum);
+	}
+	else if (Dir == 4 && Is_A_Box(Box, Load.x + 1, Load.y, Boxes, BNum) && !Is_A_Box(Box, Load.x + 2, Load.y, Boxes, tmp)) {
+		Push(Dir, Load, Box[BNum], BNum);
+	}
+	else if (Dir == 1 && !Is_A_Box(Box, Load.x, Load.y - 1, Boxes, BNum) ||
+		Dir == 2 && !Is_A_Box(Box, Load.x - 1, Load.y, Boxes, BNum) ||
+		Dir == 3 && !Is_A_Box(Box, Load.x, Load.y + 1, Boxes, BNum) ||
+		Dir == 4 && !Is_A_Box(Box, Load.x + 1, Load.y, Boxes, BNum)) {
+		Move(Dir, Load);
+	}
+}
+
+string Draw(Point& Loader, Point* Box, int X, int Y, int Boxes, int F, int& count) {
+	int kostil;
+	string out = "Осталось: ";
 	for (int i = 0; i < Y; i++) {
 		for (int j = 0; j < X; j++) {
+			if (Map[i][j] == 'p' && Is_A_Box(Box, j, i, Boxes, kostil)) {
+				F -= 1;
+			}
 			if (i == Loader.y && j == Loader.x) {
 				cout << setw(2) << "G";
 			}
-			else if (Is_A_Box(Box, j, i, Boxes)) {
+			else if (Is_A_Box(Box, j, i, Boxes, kostil)) {
 				cout << setw(2) << "B";
 			}
 			else cout << setw(2) << Map[i][j];
 		}
 		cout << endl;
 	}
+	count = F;
+	return out + to_string(F);
 }
 
 int Direction(char Key) {
@@ -122,16 +139,16 @@ int Direction(char Key) {
 }
 
 int main() {
-	//	SetConsoleCP(1251);
-	//	SetConsoleOutputCP(1251);
+	SetConsoleCP(1251);
+	SetConsoleOutputCP(1251);
 
 	int X = 0, Y = 0, Dir;
-	string* Map = nullptr;
+
 	Point Loader;
 	Loader.x = 0, Loader.y = 0;
 	int Boxes = 0;
 	Point* Box = nullptr;
-	int Points = 0;
+	int Flag = 0;
 
 	int LevelChoise;
 	cin >> LevelChoise;
@@ -148,26 +165,21 @@ int main() {
 		for (int i = 0; i < Boxes; i++) {
 			input >> Box[i].x >> Box[i].y;
 		}
-		input >> Points;
+		input >> Flag;
 	}
 	system("cls");
-	char key;
-	Draw(Loader, Map, Box, X, Y, Boxes);
-
-	while (Points > 0 || key != 'o') {
+	char key = 'r';
+	int count = Flag;
+	cout << Draw(Loader, Box, X, Y, Boxes, Flag, count);
+	while (count > 0) {
 		key = _getch();
 		system("cls");
 		Dir = Direction(key);
-		if (!Move_or_Push(Dir, Loader, Box, Boxes)) {
-			Move(Direction(key), Loader, Map);
-		}
-		else {
-			int BNum = Box_Num(Box, Loader.x, Loader.y, Boxes);
-			Push(Dir, Loader, Map, Box[BNum], BNum);
-		}
-		Draw(Loader, Map, Box, X, Y, Boxes);
+		Move_or_Push(Dir, Loader, Box, Boxes);
+		cout << Draw(Loader, Box, X, Y, Boxes, Flag, count);
 	}
-
+	system("cls");
+	cout << "Game over!" << endl << "You win!";
 
 	return 0;
 }
