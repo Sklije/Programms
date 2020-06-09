@@ -42,35 +42,35 @@ int Box_Num(Point* Box, int X, int Y, int Boxes) {
 }
 
 void Move(int Dir, Point& Load) {
-	if (Dir == 1 && (Map[Load.y - 1][Load.x] == '.' || Map[Load.y - 1][Load.x] == 'p')) {
+	if (Dir == 1 && (Map[Load.y - 1][Load.x] != '*')) {
 		Load.y -= 1;
 	}
-	else if (Dir == 2 && (Map[Load.y][Load.x - 1] == '.' || Map[Load.y][Load.x - 1] == 'p')) {
+	else if (Dir == 2 && (Map[Load.y][Load.x - 1] != '*')) {
 		Load.x -= 1;
 	}
-	else if (Dir == 3 && (Map[Load.y + 1][Load.x] == '.' || Map[Load.y + 1][Load.x] == 'p')) {
+	else if (Dir == 3 && (Map[Load.y + 1][Load.x] != '*')) {
 		Load.y += 1;
 	}
-	else if (Dir == 4 && (Map[Load.y][Load.x + 1] == '.' || Map[Load.y][Load.x + 1] == 'p')) {
+	else if (Dir == 4 && (Map[Load.y][Load.x + 1] != '*')) {
 		Load.x += 1;
 	}
 }
 
 void Push(int Dir, Point& Load, Point& Box, int BNum) {
 	if (BNum >= 0) {
-		if (Dir == 1 && (Map[Load.y - 2][Load.x] == '.' || Map[Load.y - 2][Load.x] == 'p')) {
+		if (Dir == 1 && (Map[Load.y - 2][Load.x] != '*')) {
 			Load.y -= 1;
 			Box.y -= 1;
 		}
-		else if (Dir == 2 && (Map[Load.y][Load.x - 2] == '.' || Map[Load.y][Load.x - 2] == 'p')) {
+		else if (Dir == 2 && (Map[Load.y][Load.x - 2] != '*')) {
 			Load.x -= 1;
 			Box.x -= 1;
 		}
-		else if (Dir == 3 && (Map[Load.y + 2][Load.x] == '.' || Map[Load.y + 2][Load.x] == 'p')) {
+		else if (Dir == 3 && (Map[Load.y + 2][Load.x] != '*')) {
 			Load.y += 1;
 			Box.y += 1;
 		}
-		else if (Dir == 4 && (Map[Load.y][Load.x + 2] == '.' || Map[Load.y][Load.x + 2] == 'p')) {
+		else if (Dir == 4 && (Map[Load.y][Load.x + 2] != '*')) {
 			Load.x += 1;
 			Box.x += 1;
 		}
@@ -102,7 +102,7 @@ void Move_or_Push(int Dir, Point& Load, Point* Box, int Boxes) {
 
 string Draw(Point& Loader, Point* Box, int X, int Y, int Boxes, int F, int& count) {
 	int kostil;
-	string out = "Осталось: ";
+	string out = "Left: ";
 	for (int i = 0; i < Y; i++) {
 		for (int j = 0; j < X; j++) {
 			if (Map[i][j] == 'p' && Is_A_Box(Box, j, i, Boxes, kostil)) {
@@ -167,12 +167,90 @@ int main() {
 		}
 		input >> Flag;
 	}
+	else if (LevelChoise == 2) {
+		ifstream input("Lvl2.txt");
+		input >> X >> Y;
+		Map = new string[Y];
+		for (int i = 0; i < Y; i++) {
+			input >> Map[i];
+		}
+		input >> Loader.x >> Loader.y;
+		input >> Boxes;
+		Box = new Point[Boxes];
+		for (int i = 0; i < Boxes; i++) {
+			input >> Box[i].x >> Box[i].y;
+		}
+		input >> Flag;
+	}
+	else if (LevelChoise == 3) {
+		ifstream input("Lvl3.txt");
+		input >> X >> Y;
+		Map = new string[Y];
+		for (int i = 0; i < Y; i++) {
+			input >> Map[i];
+		}
+		input >> Loader.x >> Loader.y;
+		input >> Boxes;
+		Box = new Point[Boxes];
+		for (int i = 0; i < Boxes; i++) {
+			input >> Box[i].x >> Box[i].y;
+		}
+		input >> Flag;
+	}
+
 	system("cls");
 	char key = 'r';
 	int count = Flag;
 	cout << Draw(Loader, Box, X, Y, Boxes, Flag, count);
 	while (count > 0) {
 		key = _getch();
+		if (key == 'r') {
+			if (LevelChoise == 1) {
+				ifstream input("Lvl1.txt");
+				input >> X >> Y;
+				Map = new string[Y];
+				for (int i = 0; i < Y; i++) {
+					input >> Map[i];
+				}
+				input >> Loader.x >> Loader.y;
+				input >> Boxes;
+				Box = new Point[Boxes];
+				for (int i = 0; i < Boxes; i++) {
+					input >> Box[i].x >> Box[i].y;
+				}
+				input >> Flag;
+			}
+			else if (LevelChoise == 2) {
+				ifstream input("Lvl2.txt");
+				input >> X >> Y;
+				Map = new string[Y];
+				for (int i = 0; i < Y; i++) {
+					input >> Map[i];
+				}
+				input >> Loader.x >> Loader.y;
+				input >> Boxes;
+				Box = new Point[Boxes];
+				for (int i = 0; i < Boxes; i++) {
+					input >> Box[i].x >> Box[i].y;
+				}
+				input >> Flag;
+			}
+			else if (LevelChoise == 3) {
+				ifstream input("Lvl3.txt");
+				input >> X >> Y;
+				Map = new string[Y];
+				for (int i = 0; i < Y; i++) {
+					input >> Map[i];
+				}
+				input >> Loader.x >> Loader.y;
+				input >> Boxes;
+				Box = new Point[Boxes];
+				for (int i = 0; i < Boxes; i++) {
+					input >> Box[i].x >> Box[i].y;
+				}
+				input >> Flag;
+			}
+		}
 		system("cls");
 		Dir = Direction(key);
 		Move_or_Push(Dir, Loader, Box, Boxes);
