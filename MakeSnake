@@ -1,1 +1,1 @@
-Snake: snake.c gcc -Wall -o snake snake.c
+Snake:gcc snake.c -lncurses -o snake.o -fpermissive -lstdc++
