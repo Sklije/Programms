@@ -1,12 +1,12 @@
-#include <iostream>
-#include "windows.h"
-#include <conio.h>
 #include <iomanip>
+#include <ncurses.h>
 #include <vector>
 #include <string>
-
+#include <fstream>
 
 using namespace std;
+
+string* Map = NULL;
 
 struct Point {
 	int x;
@@ -19,71 +19,248 @@ struct Point {
 	}
 };
 
-struct Map {
-	Point Loader;
-	vector<string>* map;
-	int Boxes;
-} Lvl1;
 
-
-
-void Move(char Direction, Point& Loader) {
-	if (Direction == 'w' && (*Lvl1.map)[Loader.y - 1][Loader.x] != '*') { Loader.y -= 1; }
-	else if (Direction == 's' && (*Lvl1.map)[Loader.y + 1][Loader.x] != '*') { Loader.y += 1; }
-	else if (Direction == 'a' && (*Lvl1.map)[Loader.y][Loader.x - 1] != '*') { Loader.x -= 1; }
-	else if (Direction == 'd' && (*Lvl1.map)[Loader.y][Loader.x + 1] != '*') { Loader.x += 1; }
+bool Is_A_Box(Point* Box, int X, int Y, int Boxes, int& BNum) {
+	for (int i = 0; i < Boxes; i++) {
+		if (Box[i].x == X && Box[i].y == Y) {
+			BNum = i;
+			return true;
+		}
+	}
+	return false;
 }
 
-void Drow(Point& Loader) {
-	for (int i = 0; i < 9; i++) {
-		for (int j = 0; j < 8; j++) {
-			if (Loader.y == i && Loader.x == j) {
-				cout << setw(2) << "G";
-			}
-			else {
-				cout << setw(2) << (*Lvl1.map)[i][j];
-			}
-		}
-		cout << endl;
+void Move(int Dir, Point& Load) {
+	if (Dir == 1 && (Map[Load.y - 1][Load.x] != '*')) {
+		Load.y -= 1;
+	}
+	else if (Dir == 2 && (Map[Load.y][Load.x - 1] != '*')) {
+		Load.x -= 1;
+	}
+	else if (Dir == 3 && (Map[Load.y + 1][Load.x] != '*')) {
+		Load.y += 1;
+	}
+	else if (Dir == 4 && (Map[Load.y][Load.x + 1] != '*')) {
+		Load.x += 1;
 	}
 }
+
+void Push(int Dir, Point& Load, Point& Box, int BNum) {
+	if (BNum >= 0) {
+		if (Dir == 1 && (Map[Load.y - 2][Load.x] != '*')) {
+			Load.y -= 1;
+			Box.y -= 1;
+		}
+		else if (Dir == 2 && (Map[Load.y][Load.x - 2] != '*')) {
+			Load.x -= 1;
+			Box.x -= 1;
+		}
+		else if (Dir == 3 && (Map[Load.y + 2][Load.x] != '*')) {
+			Load.y += 1;
+			Box.y += 1;
+		}
+		else if (Dir == 4 && (Map[Load.y][Load.x + 2] != '*')) {
+			Load.x += 1;
+			Box.x += 1;
+		}
+	}
+}
+
+void Move_or_Push(int Dir, Point& Load, Point* Box, int Boxes) {
+	int BNum;
+	int tmp;
+	if (Dir == 1 && Is_A_Box(Box, Load.x, Load.y - 1, Boxes, BNum) && !Is_A_Box(Box, Load.x, Load.y - 2, Boxes, tmp)) {
+		Push(Dir, Load, Box[BNum], BNum);
+	}
+	else if (Dir == 2 && Is_A_Box(Box, Load.x - 1, Load.y, Boxes, BNum) && !Is_A_Box(Box, Load.x - 2, Load.y, Boxes, tmp)) {
+		Push(Dir, Load, Box[BNum], BNum);
+	}
+	else if (Dir == 3 && Is_A_Box(Box, Load.x, Load.y + 1, Boxes, BNum) && !Is_A_Box(Box, Load.x, Load.y + 2, Boxes, tmp)) {
+		Push(Dir, Load, Box[BNum], BNum);
+	}
+	else if (Dir == 4 && Is_A_Box(Box, Load.x + 1, Load.y, Boxes, BNum) && !Is_A_Box(Box, Load.x + 2, Load.y, Boxes, tmp)) {
+		Push(Dir, Load, Box[BNum], BNum);
+	}
+	else if (Dir == 1 && !Is_A_Box(Box, Load.x, Load.y - 1, Boxes, BNum) ||
+		Dir == 2 && !Is_A_Box(Box, Load.x - 1, Load.y, Boxes, BNum) ||
+		Dir == 3 && !Is_A_Box(Box, Load.x, Load.y + 1, Boxes, BNum) ||
+		Dir == 4 && !Is_A_Box(Box, Load.x + 1, Load.y, Boxes, BNum)) {
+		Move(Dir, Load);
+	}
+}
+
+string Draw(Point& Loader, Point* Box, int X, int Y, int Boxes, int F,
+int& count) {
+int kostil;
+//string out = "Left box: ";
+ for (int i = 0; i < Y; i++) {
+   for (int j = 0; j < X; j++) {
+     if (Map[i][j] == 'p' && Is_A_Box(Box, j, i, Boxes, kostil)) {
+       //   F -= 1;
+     }
+     if (i == Loader.y && j == Loader.x) {attron(COLOR_PAIR(5));
+printw("G");refresh();}
+     else if (Is_A_Box(Box, j, i, Boxes, kostil))
+{attron(COLOR_PAIR(4)); printw("B");refresh();}
+     else if (Map[i][j]== "*") {attron(COLOR_PAIR(10)); printw("*");refresh();}
+     else if (Map[i][j]== ".") {attron(COLOR_PAIR(12)); printw(".");refresh();}
+     else if (Map[i][j]=="p") {attron(COLOR_PAIR(3)); printw("p");refresh();}
+     //     count = F;
+     //     return out + to_string(F);
+   }}}
+
+int Direction(char Key) {
+	if (Key == 'w') {
+		return 1;
+	}
+	else if (Key == 'a') {
+		return 2;
+	}
+	else if (Key == 's') {
+		return 3;
+	}
+	else if (Key == 'd') {
+		return 4;
+	}
+	else return 0;
+}
+
 int main() {
-	//	SetConsoleCP(1251);
-	//	SetConsoleOutputCP(1251);
+	start_color();
+	setlocale(LC_CTYPE,"");
+	curs_set(0);
+        init_pair(4, COLOR_YELLOW, COLOR_YELLOW);
+        init_pair(5, COLOR_BLUE, COLOR_BLUE);
+        init_pair(6, COLOR_MAGENTA, COLOR_MAGENTA);
+        init_pair(7, COLOR_CYAN, COLOR_CYAN);
+        init_pair(8, COLOR_BLUE, COLOR_BLUE);
+        init_pair(9, COLOR_WHITE, COLOR_WHITE);
+	init_pair(3, COLOR_GREEN, COLOR_GREEN );
+	init_pair(2, COLOR_BLUE, COLOR_BLACK );
+	init_pair(1, COLOR_BLUE, COLOR_BLUE );
+	init_pair(10, COLOR_WHITE, COLOR_BLACK );
+	init_pair(11, COLOR_RED, COLOR_RED );
+	init_pair(12, COLOR_BLACK, COLOR_BLACK );
+	attron(COLOR_PAIR(1));
 
-	Lvl1.map = new vector<string>{
-		"******..",
-		"*p*..**.",
-		"*ppp..**",
-		"*.*B...*",
-		"*.B.*..*",
-		"**.B.B.*",
-		".*B.B.**",
-		".*...**.",
-		".*****.."
-	};
-	Lvl1.Loader.x = 3;
-	Lvl1.Loader.y = 4;
+	int X = 0, Y = 0, Dir;
 
-	Point Loader = Lvl1.Loader;
-	char key;
-	/*for (int i = 0; i < 9; i++) {
-		for (int j = 0; j < 8; j++) {
-			if ((*Lvl1.map)[i][j] == 'G') {
-				Loader.y = i;
-				Loader.x = j;
+	Point Loader;
+	Loader.x = 0, Loader.y = 0;
+	int Boxes = 0;
+	Point* Box = NULL;
+	int Flag = 0;
+
+	int LevelChoise;
+	scanw >> LevelChoise;
+	if (LevelChoise == 1) {
+		ifstream input("Lvl1.txt");
+		input >> X >> Y;
+		Map = new string[Y];
+		for (int i = 0; i < Y; i++) {
+			input >> Map[i];
+		}
+		input >> Loader.x >> Loader.y;
+		input >> Boxes;
+		Box = new Point[Boxes];
+		for (int i = 0; i < Boxes; i++) {
+			input >> Box[i].x >> Box[i].y;
+		}
+		input >> Flag;
+	}
+	else if (LevelChoise == 2) {
+		ifstream input("Lvl2.txt");
+		input >> X >> Y;
+		Map = new string[Y];
+		for (int i = 0; i < Y; i++) {
+			input >> Map[i];
+		}
+		input >> Loader.x >> Loader.y;
+		input >> Boxes;
+		Box = new Point[Boxes];
+		for (int i = 0; i < Boxes; i++) {
+			input >> Box[i].x >> Box[i].y;
+		}
+		input >> Flag;
+	}
+	else if (LevelChoise == 3) {
+		ifstream input("Lvl3.txt");
+		input >> X >> Y;
+		Map = new string[Y];
+		for (int i = 0; i < Y; i++) {
+			input >> Map[i];
+		}
+		input >> Loader.x >> Loader.y;
+		input >> Boxes;
+		Box = new Point[Boxes];
+		for (int i = 0; i < Boxes; i++) {
+			input >> Box[i].x >> Box[i].y;
+		}
+		input >> Flag;
+	}
+
+	system("cls");
+	char key = 'r';
+	int count = Flag;
+	initscr();
+	printw << Draw(Loader, Box, X, Y, Boxes, Flag, count);
+	while (count > 0) {
+		key = getch();
+		if (key == 'r') {
+			if (LevelChoise == 1) {
+				ifstream input("Lvl1.txt");
+				input >> X >> Y;
+				Map = new string[Y];
+				for (int i = 0; i < Y; i++) {
+					input >> Map[i];
+				}
+				input >> Loader.x >> Loader.y;
+				input >> Boxes;
+				Box = new Point[Boxes];
+				for (int i = 0; i < Boxes; i++) {
+					input >> Box[i].x >> Box[i].y;
+				}
+				input >> Flag;
+			}
+			else if (LevelChoise == 2) {
+				ifstream input("Lvl2.txt");
+				input >> X >> Y;
+				Map = new string[Y];
+				for (int i = 0; i < Y; i++) {
+					input >> Map[i];
+				}
+				input >> Loader.x >> Loader.y;
+				input >> Boxes;
+				Box = new Point[Boxes];
+				for (int i = 0; i < Boxes; i++) {
+					input >> Box[i].x >> Box[i].y;
+				}
+				input >> Flag;
+			}
+			else if (LevelChoise == 3) {
+				ifstream input("Lvl3.txt");
+				input >> X >> Y;
+				Map = new string[Y];
+				for (int i = 0; i < Y; i++) {
+					input >> Map[i];
+				}
+				input >> Loader.x >> Loader.y;
+				input >> Boxes;
+				Box = new Point[Boxes];
+				for (int i = 0; i < Boxes; i++) {
+					input >> Box[i].x >> Box[i].y;
+				}
+				input >> Flag;
 			}
 		}
-	}*/
-	int krya = 1;
-	Drow(Loader);
-	while (krya != 0) {
-		key = _getch();
 		system("cls");
-
-		Move(key, Loader);
-		Drow(Loader);
-
+		Dir = Direction(key);
+		Move_or_Push(Dir, Loader, Box, Boxes);
+		printw << Draw(Loader, Box, X, Y, Boxes, Flag, count);
 	}
+	system("cls");
+	endwin();
+	printw << "Game over! You win!";
+
 	return 0;
 }
