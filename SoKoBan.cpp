@@ -7,6 +7,7 @@
 using namespace std;
 
 string* Map = NULL;
+//initscr();
 
 struct Point {
 	int x;
@@ -90,24 +91,30 @@ void Move_or_Push(int Dir, Point& Load, Point* Box, int Boxes) {
 }
 
 string Draw(Point& Loader, Point* Box, int X, int Y, int Boxes, int F,
-int& count) {
-int kostil;
-//string out = "Left box: ";
- for (int i = 0; i < Y; i++) {
-   for (int j = 0; j < X; j++) {
-     if (Map[i][j] == 'p' && Is_A_Box(Box, j, i, Boxes, kostil)) {
-       //   F -= 1;
-     }
-     if (i == Loader.y && j == Loader.x) {attron(COLOR_PAIR(5));
-printw("G");refresh();}
-     else if (Is_A_Box(Box, j, i, Boxes, kostil))
-{attron(COLOR_PAIR(4)); printw("B");refresh();}
-     else if (Map[i][j]== "*") {attron(COLOR_PAIR(10)); printw("*");refresh();}
-     else if (Map[i][j]== ".") {attron(COLOR_PAIR(12)); printw(".");refresh();}
-     else if (Map[i][j]=="p") {attron(COLOR_PAIR(3)); printw("p");refresh();}
-     //     count = F;
-     //     return out + to_string(F);
-   }}}
+	int& count) {
+	int kostil;
+	//string out = "Left box: ";
+	for (int i = 0; i < Y; i++) {
+		for (int j = 0; j < X; j++) {
+			if (Map[i][j] == 'p' && Is_A_Box(Box, j, i, Boxes, kostil)) {
+				//   F -= 1;
+			}
+			if (i == Loader.y && j == Loader.x) {
+				attron(COLOR_PAIR(5));
+				printw("G"); refresh();
+			}
+			else if (Is_A_Box(Box, j, i, Boxes, kostil))
+			{
+				attron(COLOR_PAIR(4)); printw("B"); refresh();
+			}
+			else if (&Map[i][j] == "*") { attron(COLOR_PAIR(10)); printw("*"); refresh(); }
+			else if (&Map[i][j] == ".") { attron(COLOR_PAIR(12)); printw("."); refresh(); }
+			else if (&Map[i][j] == "p") { attron(COLOR_PAIR(3)); printw("p"); refresh(); }
+			//     count = F;
+			//     return out + to_string(F);
+		}
+	}
+}
 
 int Direction(char Key) {
 	if (Key == 'w') {
@@ -127,20 +134,20 @@ int Direction(char Key) {
 
 int main() {
 	start_color();
-	setlocale(LC_CTYPE,"");
+	setlocale(LC_CTYPE, "");
 	curs_set(0);
-        init_pair(4, COLOR_YELLOW, COLOR_YELLOW);
-        init_pair(5, COLOR_BLUE, COLOR_BLUE);
-        init_pair(6, COLOR_MAGENTA, COLOR_MAGENTA);
-        init_pair(7, COLOR_CYAN, COLOR_CYAN);
-        init_pair(8, COLOR_BLUE, COLOR_BLUE);
-        init_pair(9, COLOR_WHITE, COLOR_WHITE);
-	init_pair(3, COLOR_GREEN, COLOR_GREEN );
-	init_pair(2, COLOR_BLUE, COLOR_BLACK );
-	init_pair(1, COLOR_BLUE, COLOR_BLUE );
-	init_pair(10, COLOR_WHITE, COLOR_BLACK );
-	init_pair(11, COLOR_RED, COLOR_RED );
-	init_pair(12, COLOR_BLACK, COLOR_BLACK );
+	init_pair(4, COLOR_YELLOW, COLOR_YELLOW);
+	init_pair(5, COLOR_BLUE, COLOR_BLUE);
+	init_pair(6, COLOR_MAGENTA, COLOR_MAGENTA);
+	init_pair(7, COLOR_CYAN, COLOR_CYAN);
+	init_pair(8, COLOR_BLUE, COLOR_BLUE);
+	init_pair(9, COLOR_WHITE, COLOR_WHITE);
+	init_pair(3, COLOR_GREEN, COLOR_GREEN);
+	init_pair(2, COLOR_BLUE, COLOR_BLACK);
+	init_pair(1, COLOR_BLUE, COLOR_BLUE);
+	init_pair(10, COLOR_WHITE, COLOR_BLACK);
+	init_pair(11, COLOR_RED, COLOR_RED);
+	init_pair(12, COLOR_BLACK, COLOR_BLACK);
 	attron(COLOR_PAIR(1));
 
 	int X = 0, Y = 0, Dir;
@@ -150,9 +157,9 @@ int main() {
 	int Boxes = 0;
 	Point* Box = NULL;
 	int Flag = 0;
-
+		initscr();
 	int LevelChoise;
-	scanw >> LevelChoise;
+	scanw("%a", &LevelChoise);
 	if (LevelChoise == 1) {
 		ifstream input("Lvl1.txt");
 		input >> X >> Y;
@@ -199,11 +206,11 @@ int main() {
 		input >> Flag;
 	}
 
-	system("cls");
+	//system("cls");
 	char key = 'r';
 	int count = Flag;
-	initscr();
-	printw << Draw(Loader, Box, X, Y, Boxes, Flag, count);
+
+	Draw(Loader, Box, X, Y, Boxes, Flag, count);refresh();
 	while (count > 0) {
 		key = getch();
 		if (key == 'r') {
@@ -253,14 +260,14 @@ int main() {
 				input >> Flag;
 			}
 		}
-		system("cls");
+		//system("cls");
 		Dir = Direction(key);
 		Move_or_Push(Dir, Loader, Box, Boxes);
-		printw << Draw(Loader, Box, X, Y, Boxes, Flag, count);
+		Draw(Loader, Box, X, Y, Boxes, Flag, count);
+		refresh();
 	}
-	system("cls");
+	//system("cls");
+	printw("Game over! You win!");refresh();
 	endwin();
-	printw << "Game over! You win!";
-
 	return 0;
 }
