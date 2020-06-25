@@ -32,14 +32,14 @@ bool Is_A_Box(Point* Box, int X, int Y, int Boxes, int& BNum) {
 	return false;
 }
 
-int Box_Num(Point* Box, int X, int Y, int Boxes) {
-	for (int i = 0; i < Boxes; i++) {
-		if (Box[i].x == X && Box[i].y == Y) {
-			return i;
-		}
-	}
-	return -1;
-}
+//int Box_Num(Point* Box, int X, int Y, int Boxes) {
+//	for (int i = 0; i < Boxes; i++) {
+//		if (Box[i].x == X && Box[i].y == Y) {
+//			return i;
+//		}
+//	}
+//	return -1;
+//}
 
 void Move(int Dir, Point& Load) {
 	if (Dir == 1 && (Map[Load.y - 1][Load.x] != '*')) {
@@ -151,52 +151,39 @@ int main() {
 	int Flag = 0;
 
 	int LevelChoise;
+	string lvl;
 	cin >> LevelChoise;
 	if (LevelChoise == 1) {
-		ifstream input("Lvl1.txt");
-		input >> X >> Y;
-		Map = new string[Y];
-		for (int i = 0; i < Y; i++) {
-			input >> Map[i];
-		}
-		input >> Loader.x >> Loader.y;
-		input >> Boxes;
-		Box = new Point[Boxes];
-		for (int i = 0; i < Boxes; i++) {
-			input >> Box[i].x >> Box[i].y;
-		}
-		input >> Flag;
+
+		lvl = "Lvl1.txt";
+
 	}
 	else if (LevelChoise == 2) {
-		ifstream input("Lvl2.txt");
-		input >> X >> Y;
-		Map = new string[Y];
-		for (int i = 0; i < Y; i++) {
-			input >> Map[i];
-		}
-		input >> Loader.x >> Loader.y;
-		input >> Boxes;
-		Box = new Point[Boxes];
-		for (int i = 0; i < Boxes; i++) {
-			input >> Box[i].x >> Box[i].y;
-		}
-		input >> Flag;
+
+		lvl = "Lvl2.txt";
+
 	}
 	else if (LevelChoise == 3) {
-		ifstream input("Lvl3.txt");
-		input >> X >> Y;
-		Map = new string[Y];
-		for (int i = 0; i < Y; i++) {
-			input >> Map[i];
-		}
-		input >> Loader.x >> Loader.y;
-		input >> Boxes;
-		Box = new Point[Boxes];
-		for (int i = 0; i < Boxes; i++) {
-			input >> Box[i].x >> Box[i].y;
-		}
-		input >> Flag;
+
+		lvl = "Lvl3.txt";
+
 	}
+
+
+	ifstream input(lvl);
+	input >> X >> Y;
+	Map = new string[Y];
+	for (int i = 0; i < Y; i++) {
+		input >> Map[i];
+	}
+	input >> Loader.x >> Loader.y;
+	input >> Boxes;
+	Box = new Point[Boxes];
+	for (int i = 0; i < Boxes; i++) {
+		input >> Box[i].x >> Box[i].y;
+	}
+	input >> Flag;
+
 
 	system("cls");
 	char key = 'r';
@@ -205,51 +192,21 @@ int main() {
 	while (count > 0) {
 		key = _getch();
 		if (key == 'r') {
-			if (LevelChoise == 1) {
-				ifstream input("Lvl1.txt");
-				input >> X >> Y;
-				Map = new string[Y];
-				for (int i = 0; i < Y; i++) {
-					input >> Map[i];
-				}
-				input >> Loader.x >> Loader.y;
-				input >> Boxes;
-				Box = new Point[Boxes];
-				for (int i = 0; i < Boxes; i++) {
-					input >> Box[i].x >> Box[i].y;
-				}
-				input >> Flag;
+
+			ifstream input(lvl);
+			input >> X >> Y;
+			Map = new string[Y];
+			for (int i = 0; i < Y; i++) {
+				input >> Map[i];
 			}
-			else if (LevelChoise == 2) {
-				ifstream input("Lvl2.txt");
-				input >> X >> Y;
-				Map = new string[Y];
-				for (int i = 0; i < Y; i++) {
-					input >> Map[i];
-				}
-				input >> Loader.x >> Loader.y;
-				input >> Boxes;
-				Box = new Point[Boxes];
-				for (int i = 0; i < Boxes; i++) {
-					input >> Box[i].x >> Box[i].y;
-				}
-				input >> Flag;
+			input >> Loader.x >> Loader.y;
+			input >> Boxes;
+			Box = new Point[Boxes];
+			for (int i = 0; i < Boxes; i++) {
+				input >> Box[i].x >> Box[i].y;
 			}
-			else if (LevelChoise == 3) {
-				ifstream input("Lvl3.txt");
-				input >> X >> Y;
-				Map = new string[Y];
-				for (int i = 0; i < Y; i++) {
-					input >> Map[i];
-				}
-				input >> Loader.x >> Loader.y;
-				input >> Boxes;
-				Box = new Point[Boxes];
-				for (int i = 0; i < Boxes; i++) {
-					input >> Box[i].x >> Box[i].y;
-				}
-				input >> Flag;
-			}
+			input >> Flag;
+
 		}
 		system("cls");
 		Dir = Direction(key);
