@@ -258,6 +258,7 @@ int main() {
 		}
 		Dir = Direction(key);
 		Move_or_Push(Dir, Loader, Box, Boxes);
+		printw("\n");
 		Draw(Loader, Box, X, Y, Boxes,Flag, count);
 		refresh();
 	}
