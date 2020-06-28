@@ -145,7 +145,7 @@ int main() {
 	init_pair(10, COLOR_WHITE, COLOR_BLACK);
 	init_pair(11, COLOR_RED, COLOR_RED);
 	init_pair(12, COLOR_BLACK, COLOR_BLACK);
-	attron(COLOR_PAIR(1));
+	attron(COLOR_PAIR(12));
 
 	int X = 0, Y = 0, Dir;
 
