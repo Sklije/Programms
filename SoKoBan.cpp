@@ -98,13 +98,13 @@ int kostil;
      if (Map[i][j] == 'p' && Is_A_Box(Box, j, i, Boxes, kostil)) {
        F -= 1;
      }
-     if (i == Loader.y && j == Loader.x) {attron(COLOR_PAIR(5));
+     if (i == Loader.y && j == Loader.x) {attron(COLOR_PAIR(11));
 printw("G");refresh();}
      else if (Is_A_Box(Box, j, i, Boxes, kostil))
 {attron(COLOR_PAIR(4)); printw("B");refresh();}
      else if (Map[i][j]== '*') {attron(COLOR_PAIR(9)); printw("*");refresh();}
      else if (Map[i][j]== '.') {attron(COLOR_PAIR(12)); printw(".");refresh();}
-     else if (Map[i][j]=='p') {attron(COLOR_PAIR(3)); printw("p");refresh();}
+     else if (Map[i][j]=='p') {attron(COLOR_PAIR(5)); printw("p");refresh();}
      count = F;
    }
    printw("\n");
