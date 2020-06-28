@@ -110,8 +110,8 @@ void Draw(int maxX, int maxY, Point* Snake, Food eda, int Lenght) {
         for (int i = 0; i < maxY; i++) {
                 for (int j = 0; j < maxX; j++) {
                         if (Snake_Part(Snake, Lenght, i, j)) {
-                          if (Snake[0].y == i && Snake[0].x == j) {attron(COLOR_PAIR(5));  printw("@@");refresh();}
-                          else if (Snake[1].y == i && Snake[1].x == j) {attron(COLOR_PAIR(3)); printw("oo");refresh();}
+                          if (Snake[0].y == i && Snake[0].x == j) {attron(COLOR_PAIR(3));  printw("@@");refresh();}
+                          else if (Snake[1].y == i && Snake[1].x == j) {attron(COLOR_PAIR(5)); printw("oo");refresh();}
                           else {
 					attron(COLOR_PAIR(4));
 					printw("uu"); refresh();
