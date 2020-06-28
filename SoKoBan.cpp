@@ -154,7 +154,7 @@ int main() {
 	int Boxes = 0;
 	Point* Box = NULL;
 	int Flag = 0;
-	
+	noecho();
 	int LevelChoise;
 	scanw("%i", &LevelChoise);
 	if (LevelChoise == 1) {
@@ -207,7 +207,7 @@ int main() {
 
 	Draw(Loader, Box, X, Y, Boxes, Flag, count);refresh();
 	while (count > 0) {
-	  move(1,0);
+	  move(0,0);
 		key = getch();
 		if (key == 'r') {
 			if (LevelChoise == 1) {
